@@ -10,15 +10,24 @@ app.use(cors())
 app.use(bodyParser.json())
 
 import mysql from 'mysql2/promise'
-
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'root',
-  database: 'bank',
-  port: 8889,
-})
-
+let pool
+// Create a function to establish database connection
+async function connectToDatabase() {
+  try {
+    pool = mysql.createPool({
+      host: 'mysql',
+      user: 'root',
+      password: 'root',
+      database: 'bank',
+      port: 3307,
+    })
+    console.log('Connected to MySQL database')
+    return pool
+  } catch (error) {
+    console.error('Error connecting to MySQL database:', error)
+    throw error // Rethrow the error to be caught by the caller
+  }
+}
 // help function to make code look nicer
 async function query(sql, params) {
   const [results] = await pool.execute(sql, params)
@@ -205,7 +214,15 @@ app.post('/me/accounts/transactions', async (req, res) => {
   }
 })
 
-// Starta servern
-app.listen(port, () => {
-  console.log(`Bankens backend körs på http://localhost:${port}`)
-})
+// Start the server after connecting to the database
+connectToDatabase()
+  .then((pool) => {
+    // Routes and other setup that depend on the database connection
+    app.listen(port, () => {
+      console.log(`Bankens backend körs på http://localhost:${port}`)
+    })
+  })
+  .catch((error) => {
+    console.error('Failed to start server:', error)
+    process.exit(1) // Exit the process with an error code
+  })
