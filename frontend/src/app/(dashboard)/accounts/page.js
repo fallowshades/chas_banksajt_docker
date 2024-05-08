@@ -9,7 +9,9 @@ function Accounts({ params }) {
   const [amount, setAmount] = useState(0)
   const handleGetBalance = async () => {
     try {
-      const response = await fetch('http://localhost:3001/me/accounts', {
+             const url =   "ec2-51-20-189-83.eu-north-1.compute.amazonaws.com/accounts"|| 'http://localhost:3001/accounts'
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,8 +33,10 @@ function Accounts({ params }) {
 
   const handleDeposit = async () => {
     try {
+      const isProduction = true
+      const url =  isProduction?'http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/accounts': 'http://localhost:3001/me/accounts/transactions'
       const response = await fetch(
-        'http://localhost:3001/me/accounts/transactions',
+      url,
         {
           method: 'POST',
           headers: {

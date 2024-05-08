@@ -1,19 +1,5 @@
 version: '3'
 services:
-  nextjs:
-    build: ./frontend
-    ports:
-      - '3000:3000'
-  express:
-    build: ./backend
-    ports:
-      - '3001:3001'
-    environment:
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DATABASE=root
   mysql:
     image: mysql:5.7
     platform: linux/amd64
@@ -24,6 +10,23 @@ services:
       - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
+
+  express:
+    build: ./backend
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mysql
+
+  nextjs:
+    build: ./frontend
+    ports:
+      - '3000:3000'
 
 volumes:
   mysql_data:

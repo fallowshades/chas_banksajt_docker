@@ -9,8 +9,10 @@ export default function Login({ params }) {
   const router = useRouter()
 
   const handleLogin = async () => {
+   const isProduction = true
+      const url =  isProduction?   "http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/sessions": 'http://localhost:3001/sessions'
     try {
-      const response = await fetch('http://localhost:3001/sessions', {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,6 +34,7 @@ export default function Login({ params }) {
   return (
     <div>
       <h2>Logga in</h2>
+      <form onSubmit={handleLogin}> 
       <input
         type='text'
         placeholder='Användarnamn'
@@ -44,7 +47,8 @@ export default function Login({ params }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleLogin}>Logga in</button>
+      <button  type="submit">Logga in</button>
+      </form>
     </div>
   )
 }

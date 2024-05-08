@@ -6,10 +6,13 @@ export default function SignupPage({ params }) {
   const [password, setPassword] = useState('abc')
   const router = useRouter()
 
-  const handleSignup = async () => {
+  const handleSignup = async (event) => {
+    event.preventDefault()
     try {
+      const isProduction = true
+      const url =  isProduction?  "http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/users": 'http://localhost:3001/users'
       // Send a POST request to the backend
-      const response = await fetch('http://localhost:3001/users', {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,6 +36,7 @@ export default function SignupPage({ params }) {
   return (
     <div>
       <h2>Skapa användare</h2>
+       <form onSubmit={handleSignup}> /
       <input
         type='text'
         placeholder='Användarnamn'
@@ -45,7 +49,8 @@ export default function SignupPage({ params }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleSignup}>Skapa användare</button>
+      <button  type="submit">Skapa användare</button>
+        </form>
     </div>
   )
 }

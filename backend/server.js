@@ -19,7 +19,7 @@ async function connectToDatabase() {
       user: 'root',
       password: 'root',
       database: 'bank',
-      port: 3307,
+      port: 3306,
     })
     console.log('Connected to MySQL database')
     return pool
