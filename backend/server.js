@@ -65,6 +65,17 @@ app.post('/users', async (req, res) => {
   users.push(user)
   //
   try {
+    const [existingUser] = await query(
+      'SELECT id FROM users WHERE username = ?',
+      [username]
+    )
+
+    // If a user with the same username already exists, return an error
+    if (existingUser) {
+      userIds--
+      return res.status(400).send('Username already exists')
+    }
+
     const result = await query(
       'INSERT INTO users (username, password) VALUES (?, ?)',
       [username, password]
@@ -83,7 +94,7 @@ app.post('/users', async (req, res) => {
     // accounts.push(account)
     //console.log(account)
 
-    res.status(201).send('User created')
+    res.status(201).send(`User created ${JSON.stringify(result)}`)
   } catch (error) {
     console.error('Error creating user', error)
     res.status(500).send('Error creating user')
@@ -118,7 +129,7 @@ app.post('/sessions', async (req, res) => {
     // sessions.push(session)
     // console.log(`sessions ${session}`)
     // console.log(`otp ${otp}`)
-    res.status(200).json({ accountInsertResult })
+    res.status(200).json({ accountInsertResult, otp })
   } catch (error) {
     console.error('Error fetching account:', error)
     res.status(500).send('Ett fel uppstod vid hämtning av kontot')
@@ -142,15 +153,18 @@ app.post('/me/accounts', async (req, res) => {
     )
     if (!session) {
       console.log('err session in accounts')
-      return res.status(401).send('Ogiltig session')
+      return res.status(401).send('Ogiltig session finns inte i session')
     }
+    const foreignUserKey = session.userId
     console.log(session)
     const [account] = await query('SELECT * FROM accounts WHERE userId = ?', [
-      session.userId,
+      foreignUserKey,
     ])
     if (!account) {
       console.log('err account in accounts')
-      return res.status(401).send('Ogiltig session')
+      return res
+        .status(401)
+        .send(`Ogiltig session ${session.userId} finns inte i accounts`)
     }
     // Din kod för att visa saldo här
     let saldo = 0
@@ -186,12 +200,15 @@ app.post('/me/accounts/transactions', async (req, res) => {
     }
     console.log(JSON.stringify(sessions))
 
+    const foreignUserKey = session.userId
     const [account] = await query('SELECT * FROM accounts WHERE userId = ?', [
-      session.userId,
+      foreignUserKey,
     ])
     if (!account) {
       console.log('err no account in transaction')
-      return res.status(401).send('Ogiltig session')
+      return res
+        .status(401)
+        .send(`Ogiltig session ${session.userId} finns inte i accounts`)
     }
     // Din kod för att hantera transaktioner här
     // account.balance += amount

@@ -8,9 +8,12 @@ export default function Login({ params }) {
   const [otp, setOtp] = useState('')
   const router = useRouter()
 
-  const handleLogin = async () => {
-   const isProduction = true
-      const url =  isProduction?   "http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/sessions": 'http://localhost:3001/sessions'
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    const isProduction = true
+    const url = isProduction
+      ? 'http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/sessions'
+      : 'http://localhost:3001/sessions'
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -34,20 +37,20 @@ export default function Login({ params }) {
   return (
     <div>
       <h2>Logga in</h2>
-      <form onSubmit={handleLogin}> 
-      <input
-        type='text'
-        placeholder='Användarnamn'
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type='password'
-        placeholder='Lösenord'
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button  type="submit">Logga in</button>
+      <form onSubmit={handleLogin}>
+        <input
+          type='text'
+          placeholder='Användarnamn'
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type='password'
+          placeholder='Lösenord'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type='submit'>Logga in</button>
       </form>
     </div>
   )

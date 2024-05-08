@@ -9,7 +9,10 @@ function Accounts({ params }) {
   const [amount, setAmount] = useState(0)
   const handleGetBalance = async () => {
     try {
-             const url =   "ec2-51-20-189-83.eu-north-1.compute.amazonaws.com/accounts"|| 'http://localhost:3001/accounts'
+      const isProduction = true
+      const url = isProduction
+        ? 'http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/me/accounts'
+        : 'http://localhost:3001/me/accounts'
 
       const response = await fetch(url, {
         method: 'POST',
@@ -31,20 +34,20 @@ function Accounts({ params }) {
     }
   }
 
-  const handleDeposit = async () => {
+  const handleDeposit = async (event) => {
+    event.preventDefault()
     try {
       const isProduction = true
-      const url =  isProduction?'http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/accounts': 'http://localhost:3001/me/accounts/transactions'
-      const response = await fetch(
-      url,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username: 'abc', otp, amount }),
-        }
-      )
+      const url = isProduction
+        ? 'http://ec2-51-20-189-83.eu-north-1.compute.amazonaws.com:3001/me/accounts/transactions'
+        : 'http://localhost:3001/me/accounts/transactions'
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: 'abc', otp, amount }),
+      })
       if (response.ok) {
         // Reload balance or update UI
         const data = await response.json() // Parse response body as JSON
